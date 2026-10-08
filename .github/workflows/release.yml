@@ -1,0 +1,101 @@
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+env:
+  CARGO_TERM_COLOR: always
+  CARGO_INCREMENTAL: "0"
+
+jobs:
+  build:
+    name: ${{ matrix.target }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { os: ubuntu-latest,    target: x86_64-unknown-linux-gnu,  cross: false }
+          - { os: ubuntu-24.04-arm, target: aarch64-unknown-linux-gnu, cross: false }
+          - { os: macos-latest,     target: aarch64-apple-darwin,      cross: false }
+          - { os: macos-latest,     target: x86_64-apple-darwin,       cross: true  }
+          - { os: windows-latest,   target: x86_64-pc-windows-msvc,    cross: false }
+          - { os: windows-latest,   target: aarch64-pc-windows-msvc,   cross: true  }
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Rust
+        shell: bash
+        run: |
+          rustup toolchain install stable --profile minimal
+          rustup default stable
+          rustup target add ${{ matrix.target }}
+      - name: System libraries (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libxkbcommon-dev libwayland-dev libxrandr-dev libxi-dev \
+            libxcursor-dev libx11-dev libgl1-mesa-dev
+      - uses: Swatinem/rust-cache@v2
+        with:
+          key: ${{ matrix.target }}
+      - name: Build the CLI
+        run: cargo build --release -p oopc --target ${{ matrix.target }}
+      - name: Build the app (best effort)
+        id: app
+        continue-on-error: true
+        run: cargo build --release -p openomsi-devtools --target ${{ matrix.target }}
+      - name: Package
+        id: package
+        shell: bash
+        run: |
+          name="openomsi-devtools-${{ matrix.target }}"
+          dist="dist/$name"
+          mkdir -p "$dist"
+          bindir="target/${{ matrix.target }}/release"
+          if [ "${{ runner.os }}" = "Windows" ]; then ext=".exe"; else ext=""; fi
+          cp "$bindir/oopc$ext" "$dist/" 2>/dev/null || cp "$bindir/oopc" "$dist/"
+          if [ -f "$bindir/openomsi-devtools$ext" ]; then cp "$bindir/openomsi-devtools$ext" "$dist/"; fi
+          cp README.md LICENSE "$dist/"
+          cp -r docs "$dist/docs"
+          cd dist
+          if [ "${{ runner.os }}" = "Windows" ]; then
+            7z a "$name.zip" "$name" >/dev/null
+            echo "archive=dist/$name.zip" >> "$GITHUB_OUTPUT"
+          else
+            tar czf "$name.tar.gz" "$name"
+            echo "archive=dist/$name.tar.gz" >> "$GITHUB_OUTPUT"
+          fi
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.target }}
+          path: ${{ steps.package.outputs.archive }}
+          if-no-files-found: error
+
+  release:
+    name: Publish release
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+      - name: Collect archives and checksums
+        run: |
+          mkdir -p release
+          find artifacts -type f \( -name '*.tar.gz' -o -name '*.zip' \) -exec cp {} release/ \;
+          cd release
+          sha256sum * > SHA256SUMS
+          cat SHA256SUMS
+      - name: Create the GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: release/*
+          generate_release_notes: true
+          body: |
+            Prebuilt `oopc` and the openOMSI Development Tools app for Windows, Linux and macOS
+            (x86_64 and ARM64). Verify a download against `SHA256SUMS`.

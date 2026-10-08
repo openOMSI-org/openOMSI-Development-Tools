@@ -9,6 +9,14 @@ members = [
     "apps/devtools",
     "xtask",
 ]
+default-members = [
+    "crates/oop-format",
+    "crates/lua-obfuscator",
+    "crates/wasm-strip",
+    "crates/openomsi-plugin-sdk",
+    "crates/oopc",
+    "xtask",
+]
 
 [workspace.package]
 version = "0.1.0"
