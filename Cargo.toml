@@ -2,6 +2,7 @@
 resolver = "3"
 members = [
     "crates/oop-format",
+    "crates/lua-obfuscator",
 ]
 
 [workspace.package]
