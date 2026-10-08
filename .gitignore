@@ -1,0 +1,7 @@
+/target
+**/target
+/dist
+/docs/book
+*.oopkey
+!crates/oop-format/tests/vectors/*.oopkey
+.DS_Store

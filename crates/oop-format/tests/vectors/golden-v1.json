@@ -1,0 +1,44 @@
+{
+  "about": "Test vectors of the .oop format v1. golden-v1-signed.oop: salt 32 x 0x11, nonce 24 x 0x22, stored zstd blocks, signed with test-key.oopkey (seed 32 x 0x42; never trust it). golden-v1-unsigned.oop: random salt and nonce, default compression. Both hold the header and files below.",
+  "header": {
+    "id": "org.openomsi.golden",
+    "name": "Golden vector",
+    "version": "1.2.0",
+    "authors": [
+      "openOMSI"
+    ],
+    "description": "Test vector of the .oop format v1",
+    "kind": "lua",
+    "entry": "main.lua",
+    "min_openomsi": "0.2.22",
+    "api_abi": 1,
+    "permissions": [
+      "ui",
+      "storage"
+    ],
+    "license": "MIT",
+    "homepage": "https://github.com/openOMSI-Project/openOMSI-Development-Tools",
+    "created": "2026-10-08T12:00:00Z",
+    "tool": "oopc 0.1.0"
+  },
+  "signer_fingerprint": "3097:e2de:e2cb:4a34",
+  "signer_public_key_hex": "2152f8d19b791d24453242e15f2eab6cb7cffa7b6a5ed30097960e069881db12",
+  "files": [
+    {
+      "path": "assets/bytes.bin",
+      "size": 256
+    },
+    {
+      "path": "empty.txt",
+      "size": 0
+    },
+    {
+      "path": "lib/util.lua",
+      "size": 75
+    },
+    {
+      "path": "main.lua",
+      "size": 66
+    }
+  ]
+}

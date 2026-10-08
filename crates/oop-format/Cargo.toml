@@ -1,0 +1,31 @@
+[package]
+name = "oop-format"
+description = "Reader and writer of .oop files, the packed, encrypted and optionally signed plugins of openOMSI"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+authors.workspace = true
+keywords = ["openomsi", "plugin", "omsi"]
+categories = ["encoding", "game-development"]
+
+[dependencies]
+serde = { workspace = true }
+serde_json = { workspace = true }
+chacha20poly1305 = { version = "0.11", default-features = false, features = ["alloc"] }
+hkdf = "0.13"
+sha2 = { version = "0.11", default-features = false }
+ed25519-dalek = { version = "3", default-features = false, features = ["fast", "zeroize"] }
+ruzstd = { version = "0.9", default-features = false, features = ["std"] }
+base64 = "0.23"
+getrandom = "0.4"
+
+[target.'cfg(all(target_arch = "wasm32", target_os = "unknown"))'.dependencies]
+getrandom = { version = "0.4", features = ["wasm_js"] }
+
+[dev-dependencies]
+# The tests build hostile files with an independent implementation of the container.
+chacha20poly1305 = { version = "0.11", default-features = false, features = ["alloc"] }
+hkdf = "0.13"
+sha2 = "0.11"
