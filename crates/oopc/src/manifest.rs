@@ -30,25 +30,25 @@ pub struct Plugin {
     /// `lua` or `rust`.
     pub kind: ProjectKind,
     /// The entry file for a Lua plugin (default `main.lua`). Ignored for Rust.
-    #[serde(default)]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub entry: Option<String>,
     /// Authors.
-    #[serde(default)]
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub authors: Vec<String>,
     /// A sentence or two.
-    #[serde(default)]
+    #[serde(default, skip_serializing_if = "String::is_empty")]
     pub description: String,
     /// The oldest openOMSI this plugin supports.
-    #[serde(default)]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub min_openomsi: Option<String>,
     /// What the plugin may do (see `oop_format::permissions`).
-    #[serde(default)]
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub permissions: Vec<String>,
     /// SPDX license.
-    #[serde(default)]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub license: Option<String>,
     /// Homepage.
-    #[serde(default)]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub homepage: Option<String>,
 }
 

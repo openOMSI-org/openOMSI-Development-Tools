@@ -5,3 +5,4 @@
 *.oopkey
 !crates/oop-format/tests/vectors/*.oopkey
 .DS_Store
+/site

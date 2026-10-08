@@ -1,0 +1,29 @@
+[package]
+name = "openomsi-devtools"
+description = "The openOMSI Development Tools desktop app"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+authors.workspace = true
+
+[[bin]]
+name = "openomsi-devtools"
+path = "src/main.rs"
+
+[dependencies]
+oop-format = { workspace = true }
+oopc = { path = "../../crates/oopc", version = "0.1.0" }
+serde = { workspace = true }
+serde_json = { workspace = true }
+egui = "0.35"
+egui-wgpu = "0.35"
+wgpu = { version = "29", default-features = false, features = ["std", "parking_lot", "metal", "vulkan", "dx12", "gles", "wgsl", "noop"] }
+pollster = "0.4"
+png = "0.18"
+dirs = "7"
+toml = "1"
+
+[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
+eframe = { version = "0.35", default-features = false, features = ["wgpu", "default_fonts", "x11", "wayland"] }

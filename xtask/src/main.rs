@@ -3,6 +3,8 @@
 //! game side will export a bigger manifest as the API grows; regenerating is then this one
 //! command.
 
+mod docs;
+
 use std::path::{Path, PathBuf};
 
 use serde_json::Value;
@@ -23,8 +25,16 @@ fn main() {
                 }
             }
         }
+        Some("gen-docs") => {
+            let root = workspace_root();
+            let out = args.next().map(PathBuf::from).unwrap_or_else(|| docs::default_out(&root));
+            if let Err(e) = docs::gen_docs(&root, &out) {
+                eprintln!("error: {e}");
+                std::process::exit(1);
+            }
+        }
         _ => {
-            eprintln!("usage: cargo xtask gen-sdk [path/to/api.json]");
+            eprintln!("usage: cargo xtask <gen-sdk [api.json] | gen-docs [out_dir]>");
             std::process::exit(2);
         }
     }

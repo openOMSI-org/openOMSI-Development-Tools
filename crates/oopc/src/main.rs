@@ -5,11 +5,7 @@
 //! sources never go into the file - Lua is run through an obfuscating compiler, Rust is compiled
 //! to a stripped WebAssembly module.
 
-mod build;
-mod commands;
-mod manifest;
-mod templates;
-mod util;
+use oopc::commands;
 
 use std::path::PathBuf;
 use std::process::ExitCode;

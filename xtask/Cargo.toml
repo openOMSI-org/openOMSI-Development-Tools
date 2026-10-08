@@ -9,3 +9,4 @@ publish = false
 
 [dependencies]
 serde_json = { workspace = true }
+pulldown-cmark = { version = "0.13", default-features = false, features = ["html"] }
