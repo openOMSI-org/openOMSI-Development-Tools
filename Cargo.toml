@@ -5,6 +5,7 @@ members = [
     "crates/lua-obfuscator",
     "crates/wasm-strip",
     "crates/openomsi-plugin-sdk",
+    "crates/oopc",
     "xtask",
 ]
 
@@ -13,12 +14,14 @@ version = "0.1.0"
 edition = "2024"
 rust-version = "1.90"
 license = "MIT"
-repository = "https://github.com/openOMSI-Project/openOMSI-Development-Tools"
-homepage = "https://openomsi-project.github.io/openOMSI-Development-Tools/"
+repository = "https://github.com/openOMSI-org/openOMSI-Development-Tools"
+homepage = "https://openomsi-org.github.io/openOMSI-Development-Tools/"
 authors = ["usonskyyyy"]
 
 [workspace.dependencies]
 oop-format = { path = "crates/oop-format", version = "0.1.0" }
+lua-obfuscator = { path = "crates/lua-obfuscator", version = "0.1.0" }
+wasm-strip = { path = "crates/wasm-strip", version = "0.1.0" }
 serde = { version = "1", features = ["derive"] }
 serde_json = { version = "1", features = ["preserve_order"] }
 
