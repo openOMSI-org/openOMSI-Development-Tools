@@ -1,0 +1,11 @@
+[package]
+name = "xtask"
+description = "Workspace tasks: generate the plugin SDK's typed API from an API manifest"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish = false
+
+[dependencies]
+serde_json = { workspace = true }

@@ -3,6 +3,9 @@ resolver = "3"
 members = [
     "crates/oop-format",
     "crates/lua-obfuscator",
+    "crates/wasm-strip",
+    "crates/openomsi-plugin-sdk",
+    "xtask",
 ]
 
 [workspace.package]

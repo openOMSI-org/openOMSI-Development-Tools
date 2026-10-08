@@ -1,0 +1,16 @@
+[package]
+name = "openomsi-plugin-sdk"
+description = "Write openOMSI plugins in Rust: a safe, idiomatic guest SDK that compiles to WebAssembly"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+authors.workspace = true
+readme = "README.md"
+
+[dependencies]
+serde_json = { workspace = true }
+
+[lints.rust]
+unsafe_op_in_unsafe_fn = "warn"

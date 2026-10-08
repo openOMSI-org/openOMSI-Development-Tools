@@ -1,0 +1,12 @@
+[package]
+name = "wasm-strip"
+description = "Strips names, debug info and other custom sections from a WebAssembly module (pure Rust)"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+authors.workspace = true
+
+[dependencies]
+wasmparser = "0.261"
