@@ -126,6 +126,27 @@ fn gen_sdk(manifest: &Path, out: &Path) -> Result<usize, String> {
     Ok(count)
 }
 
+/// The return type of a function whose manifest entry has no `rtype` hint (the game's own
+/// manifest), from its `multi` flag and the first words of its `returns` description.
+fn infer_rtype(returns: &str, multi: bool) -> &'static str {
+    if multi {
+        return "multi";
+    }
+    let r = returns.trim().to_ascii_lowercase();
+    let first = r.split(|c: char| !c.is_ascii_alphabetic()).next().unwrap_or("");
+    let or_nil = r.contains("or nil") || r.contains("or `nil`");
+    match first {
+        "boolean" | "true" => "bool",
+        "number" | "integer" if or_nil => "number?",
+        "number" | "integer" => "number",
+        "string" | "text" if or_nil => "string?",
+        "string" | "text" => "string",
+        "list" => "list",
+        "nil" => "nil",
+        _ => "any",
+    }
+}
+
 fn indent(code: &str) -> String {
     code.lines().map(|l| if l.is_empty() { String::new() } else { format!("    {l}") }).collect::<Vec<_>>().join("\n")
         + "\n"
@@ -136,7 +157,9 @@ fn gen_fn(f: &Value, params: &[Value]) -> Option<String> {
     let short = full.rsplit('.').next().unwrap_or(full);
     let doc = f.get("doc").and_then(Value::as_str).unwrap_or("");
     let returns = f.get("returns").and_then(Value::as_str).unwrap_or("");
-    let rtype = f.get("rtype").and_then(Value::as_str).unwrap_or("any");
+    let multi = f.get("multi").and_then(Value::as_bool).unwrap_or(false);
+    let inferred = infer_rtype(returns, multi);
+    let rtype = f.get("rtype").and_then(Value::as_str).unwrap_or(inferred);
 
     let mut sig_params = Vec::new();
     let mut arg_exprs = Vec::new();

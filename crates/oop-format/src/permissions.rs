@@ -14,26 +14,31 @@ pub struct Permission {
     pub description: &'static str,
 }
 
-/// Every permission this version of the tools knows.
+/// Every permission this version of the tools knows: the game's own list (openOMSI's
+/// `crates/omsi-plugin/src/api` `Perm`, and each function's `permission` in its
+/// `docs/plugin-api.json`).
 pub const KNOWN: &[Permission] = &[
     Permission { name: "ui", description: "Show panels, notifications and messages on the screen" },
-    Permission { name: "storage", description: "Keep data between sessions in the plugin's own storage" },
+    Permission { name: "storage", description: "Keep data between sessions in the plugin's own data folder and storage" },
     Permission {
         name: "vehicle_write",
-        description: "Change the player's bus: set script variables, press keys and fire triggers",
+        description: "Change the player's bus: script variables, keys and triggers, doors, the destination",
     },
     Permission {
         name: "traffic_write",
-        description: "Change other vehicles: set script variables of AI traffic and other players' buses",
+        description: "Change the AI traffic and the people, and other vehicles' script variables",
     },
     Permission {
-        name: "game_control",
-        description: "Run game commands: refuel, repair, reset, teleport, save and load, change the time and weather",
+        name: "world_write",
+        description: "Change the world: weather, time, pause, teleport, the duty and the game menu's actions (refuel, repair, save, ...)",
     },
+    Permission { name: "camera", description: "Move the camera and switch the view" },
+    Permission { name: "audio", description: "Play sounds" },
     Permission {
         name: "network_local",
         description: "Send messages to programs on this computer (UDP to 127.0.0.1, never the internet)",
     },
+    Permission { name: "lan", description: "Send messages to the other players of a LAN game" },
 ];
 
 /// Looks a permission up by name.
