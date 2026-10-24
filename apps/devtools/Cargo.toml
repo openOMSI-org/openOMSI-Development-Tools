@@ -1,29 +1,33 @@
 [package]
 name = "openomsi-devtools"
-description = "The openOMSI Development Tools desktop app"
+description = "openOMSI Development Tools: the desktop app for writing, building and signing openOMSI plugins"
 version.workspace = true
 edition.workspace = true
 rust-version.workspace = true
 license.workspace = true
 repository.workspace = true
 authors.workspace = true
+build = "build.rs"
 
 [[bin]]
 name = "openomsi-devtools"
 path = "src/main.rs"
 
+[build-dependencies]
+tauri-build = { version = "2.6", features = [] }
+
 [dependencies]
 oop-format = { workspace = true }
-oopc = { path = "../../crates/oopc", version = "0.1.0" }
+oopc = { path = "../../crates/oopc", version = "0.2.0" }
 serde = { workspace = true }
 serde_json = { workspace = true }
-egui = "0.35"
-egui-wgpu = "0.35"
-wgpu = { version = "29", default-features = false, features = ["std", "parking_lot", "metal", "vulkan", "dx12", "gles", "wgsl", "noop"] }
-pollster = "0.4"
-png = "0.18"
-dirs = "7"
 toml = "1"
+dirs = "7"
+tauri = { version = "2.12", features = [] }
+rfd = "0.15"
+ureq = { version = "2", default-features = false, features = ["tls"] }
+sha2 = "0.11"
+zip = { version = "9.0", default-features = false, features = ["deflate"] }
 
-[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
-eframe = { version = "0.35", default-features = false, features = ["wgpu", "default_fonts", "x11", "wayland"] }
+[dev-dependencies]
+tempfile = "3"

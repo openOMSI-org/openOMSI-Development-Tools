@@ -10,11 +10,27 @@ use serde_json::Value;
 /// permissions they need without a game checkout.
 pub const API_JSON: &str = include_str!("../../openomsi-plugin-sdk/api.json");
 
-/// The directory where signing keys are kept (created on demand): the user's config dir under
-/// `openOMSI-devtools/keys`.
-pub fn keys_dir() -> Result<PathBuf, String> {
+/// The openOMSI version the embedded API manifest describes (`0.2.22`).
+pub fn api_version() -> String {
+    serde_json::from_str::<Value>(API_JSON)
+        .ok()
+        .and_then(|v| v.get("version").and_then(Value::as_str).map(str::to_string))
+        .unwrap_or_default()
+}
+
+/// The folder the tools keep their own files in: the user's config dir under
+/// `openOMSI-devtools` (`OPENOMSI_DEVTOOLS_HOME` names another place, for tests).
+pub fn config_dir() -> Result<PathBuf, String> {
+    if let Some(home) = std::env::var_os("OPENOMSI_DEVTOOLS_HOME").filter(|v| !v.is_empty()) {
+        return Ok(PathBuf::from(home));
+    }
     let base = dirs::config_dir().ok_or("cannot find a config directory for this user")?;
-    Ok(base.join("openOMSI-devtools").join("keys"))
+    Ok(base.join("openOMSI-devtools"))
+}
+
+/// The directory where signing keys are kept (created on demand): `keys` in the config dir.
+pub fn keys_dir() -> Result<PathBuf, String> {
+    Ok(config_dir()?.join("keys"))
 }
 
 /// An RFC 3339 UTC timestamp for "now", computed without a date-time dependency.

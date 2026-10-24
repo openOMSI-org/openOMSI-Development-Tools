@@ -66,7 +66,17 @@ pub fn info_value(key: &str) -> Result<Value> {
 ///
 /// Returns: nil
 pub fn message(text: &str, seconds: Option<f64>) -> Result<()> {
-    call("message", json!([json!(text), match seconds { Some(v) => json!(v), None => Value::Null }]))?; Ok(())
+    call(
+        "message",
+        json!([
+            json!(text),
+            match seconds {
+                Some(v) => json!(v),
+                None => Value::Null,
+            }
+        ]),
+    )?;
+    Ok(())
 }
 
 /// The other vehicles within `radius` m of the bus (default 300): each `{id, kind, name, x, y,
@@ -75,7 +85,16 @@ pub fn message(text: &str, seconds: Option<f64>) -> Result<()> {
 ///
 /// Returns: list of tables
 pub fn others(radius: Option<f64>) -> Result<Vec<Value>> {
-    Ok(call("others", json!([match radius { Some(v) => json!(v), None => Value::Null }]))?.as_array().cloned().unwrap_or_default())
+    Ok(call(
+        "others",
+        json!([match radius {
+            Some(v) => json!(v),
+            None => Value::Null,
+        }]),
+    )?
+    .as_array()
+    .cloned()
+    .unwrap_or_default())
 }
 
 /// Where the bus is: map metres (x east, y north, z up) and its heading in degrees clockwise
@@ -90,14 +109,16 @@ pub fn position() -> Result<Vec<Value>> {
 ///
 /// Returns: nil
 pub fn press(name: &str) -> Result<()> {
-    call("press", json!([json!(name)]))?; Ok(())
+    call("press", json!([json!(name)]))?;
+    Ok(())
 }
 
 /// Lets a key go: fires `<name>_off`.
 ///
 /// Returns: nil
 pub fn release(name: &str) -> Result<()> {
-    call("release", json!([json!(name)]))?; Ok(())
+    call("release", json!([json!(name)]))?;
+    Ok(())
 }
 
 /// Sets a string variable; `true` when the bus has it.
@@ -147,7 +168,8 @@ pub fn time() -> Result<f64> {
 ///
 /// Returns: nil
 pub fn trigger(name: &str) -> Result<()> {
-    call("trigger", json!([json!(name)]))?; Ok(())
+    call("trigger", json!([json!(name)]))?;
+    Ok(())
 }
 
 /// A script variable of the bus (`Velocity`, `elec_busbar_main`, the names the `.osc` files and
@@ -162,7 +184,16 @@ pub fn var(name: &str) -> Result<Option<f64>> {
 ///
 /// Returns: list of strings
 pub fn vars(kind: Option<&str>) -> Result<Vec<Value>> {
-    Ok(call("vars", json!([match kind { Some(v) => json!(v), None => Value::Null }]))?.as_array().cloned().unwrap_or_default())
+    Ok(call(
+        "vars",
+        json!([match kind {
+            Some(v) => json!(v),
+            None => Value::Null,
+        }]),
+    )?
+    .as_array()
+    .cloned()
+    .unwrap_or_default())
 }
 
 /// The vehicle's name (manufacturer and type), or `nil` on foot.
@@ -197,14 +228,27 @@ pub mod audio {
     ///
     /// Returns: integer id or nil, reason
     pub fn play(file: &str, opts: Option<serde_json::Value>) -> Result<Vec<Value>> {
-        Ok(call("audio.play", json!([json!(file), match opts { Some(v) => json!(v), None => Value::Null }]))?.as_array().cloned().unwrap_or_default())
+        Ok(call(
+            "audio.play",
+            json!([
+                json!(file),
+                match opts {
+                    Some(v) => json!(v),
+                    None => Value::Null,
+                }
+            ]),
+        )?
+        .as_array()
+        .cloned()
+        .unwrap_or_default())
     }
 
     /// Stops every sound of the plugin's.
     ///
     /// Returns: nil
     pub fn stop_all() -> Result<()> {
-        call("audio.stop_all", Value::Array(vec![]))?; Ok(())
+        call("audio.stop_all", Value::Array(vec![]))?;
+        Ok(())
     }
 
     /// The game's volume setting, 0 to 1.
@@ -213,7 +257,6 @@ pub mod audio {
     pub fn volume() -> Result<Option<f64>> {
         Ok(call("audio.volume", Value::Array(vec![]))?.as_f64())
     }
-
 }
 
 /// The `bus` group of the API.
@@ -232,7 +275,18 @@ pub mod bus {
     ///
     /// Returns: boolean
     pub fn action(name: &str, down: Option<bool>) -> Result<bool> {
-        Ok(call("bus.action", json!([json!(name), match down { Some(v) => json!(v), None => Value::Null }]))?.as_bool().unwrap_or(false))
+        Ok(call(
+            "bus.action",
+            json!([
+                json!(name),
+                match down {
+                    Some(v) => json!(v),
+                    None => Value::Null,
+                }
+            ]),
+        )?
+        .as_bool()
+        .unwrap_or(false))
     }
 
     /// What the bus drives with now: the pedals (0 to 1) and the steering (-1 left to 1 right),
@@ -342,7 +396,13 @@ pub mod bus {
     ///
     /// Returns: table
     pub fn get_strings(names: Option<serde_json::Value>) -> Result<Value> {
-        call("bus.get_strings", json!([match names { Some(v) => json!(v), None => Value::Null }]))
+        call(
+            "bus.get_strings",
+            json!([match names {
+                Some(v) => json!(v),
+                None => Value::Null,
+            }]),
+        )
     }
 
     /// Many script variables at once: a table name -> value of the names given, or of every
@@ -350,7 +410,13 @@ pub mod bus {
     ///
     /// Returns: table
     pub fn get_vars(names: Option<serde_json::Value>) -> Result<Value> {
-        call("bus.get_vars", json!([match names { Some(v) => json!(v), None => Value::Null }]))
+        call(
+            "bus.get_vars",
+            json!([match names {
+                Some(v) => json!(v),
+                None => Value::Null,
+            }]),
+        )
     }
 
     /// Whether the parking brake is on.
@@ -596,7 +662,6 @@ pub mod bus {
     pub fn wheels() -> Result<Vec<Value>> {
         Ok(call("bus.wheels", Value::Array(vec![]))?.as_array().cloned().unwrap_or_default())
     }
-
 }
 
 /// The `camera` group of the API.
@@ -660,7 +725,24 @@ pub mod camera {
     ///
     /// Returns: boolean
     pub fn set_free(x: f64, y: f64, z: f64, yaw: Option<f64>, pitch: Option<f64>) -> Result<bool> {
-        Ok(call("camera.set_free", json!([json!(x), json!(y), json!(z), match yaw { Some(v) => json!(v), None => Value::Null }, match pitch { Some(v) => json!(v), None => Value::Null }]))?.as_bool().unwrap_or(false))
+        Ok(call(
+            "camera.set_free",
+            json!([
+                json!(x),
+                json!(y),
+                json!(z),
+                match yaw {
+                    Some(v) => json!(v),
+                    None => Value::Null,
+                },
+                match pitch {
+                    Some(v) => json!(v),
+                    None => Value::Null,
+                }
+            ]),
+        )?
+        .as_bool()
+        .unwrap_or(false))
     }
 
     /// Switches the view: `"driver"`, `"pax"`, `"outside"`, `"map"` (the free camera above the
@@ -684,7 +766,6 @@ pub mod camera {
     pub fn view() -> Result<Option<String>> {
         Ok(call("camera.view", Value::Array(vec![]))?.as_str().map(str::to_string))
     }
-
 }
 
 /// The `duty` group of the API.
@@ -758,7 +839,6 @@ pub mod duty {
     pub fn trips() -> Result<Vec<Value>> {
         Ok(call("duty.trips", Value::Array(vec![]))?.as_array().cloned().unwrap_or_default())
     }
-
 }
 
 /// The `files` group of the API.
@@ -797,7 +877,16 @@ pub mod files {
     ///
     /// Returns: list of tables, or nil and the reason
     pub fn list(dir: Option<&str>) -> Result<Vec<Value>> {
-        Ok(call("files.list", json!([match dir { Some(v) => json!(v), None => Value::Null }]))?.as_array().cloned().unwrap_or_default())
+        Ok(call(
+            "files.list",
+            json!([match dir {
+                Some(v) => json!(v),
+                None => Value::Null,
+            }]),
+        )?
+        .as_array()
+        .cloned()
+        .unwrap_or_default())
     }
 
     /// Makes a folder (and those above it) in the data folder.
@@ -822,7 +911,6 @@ pub mod files {
     pub fn write(path: &str, data: &str) -> Result<Vec<Value>> {
         Ok(call("files.write", json!([json!(path), json!(data)]))?.as_array().cloned().unwrap_or_default())
     }
-
 }
 
 /// The `fmt` group of the API.
@@ -832,7 +920,19 @@ pub mod fmt {
     ///
     /// Returns: string
     pub fn clock(seconds: f64, with_seconds: Option<bool>) -> Result<String> {
-        Ok(call("fmt.clock", json!([json!(seconds), match with_seconds { Some(v) => json!(v), None => Value::Null }]))?.as_str().unwrap_or_default().to_string())
+        Ok(call(
+            "fmt.clock",
+            json!([
+                json!(seconds),
+                match with_seconds {
+                    Some(v) => json!(v),
+                    None => Value::Null,
+                }
+            ]),
+        )?
+        .as_str()
+        .unwrap_or_default()
+        .to_string())
     }
 
     /// A delay as a timetable display shows it: `"+2:30"` late, `"-0:45"` early, `"0:00"`.
@@ -862,21 +962,57 @@ pub mod fmt {
     ///
     /// Returns: string
     pub fn money(amount: f64, symbol: Option<&str>) -> Result<String> {
-        Ok(call("fmt.money", json!([json!(amount), match symbol { Some(v) => json!(v), None => Value::Null }]))?.as_str().unwrap_or_default().to_string())
+        Ok(call(
+            "fmt.money",
+            json!([
+                json!(amount),
+                match symbol {
+                    Some(v) => json!(v),
+                    None => Value::Null,
+                }
+            ]),
+        )?
+        .as_str()
+        .unwrap_or_default()
+        .to_string())
     }
 
     /// A speed as `"42 km/h"`, or in `"mph"` or `"m/s"`.
     ///
     /// Returns: string
     pub fn speed(kmh: f64, unit: Option<&str>) -> Result<String> {
-        Ok(call("fmt.speed", json!([json!(kmh), match unit { Some(v) => json!(v), None => Value::Null }]))?.as_str().unwrap_or_default().to_string())
+        Ok(call(
+            "fmt.speed",
+            json!([
+                json!(kmh),
+                match unit {
+                    Some(v) => json!(v),
+                    None => Value::Null,
+                }
+            ]),
+        )?
+        .as_str()
+        .unwrap_or_default()
+        .to_string())
     }
 
     /// A text cut at every `separator` (`","` by default; plainly, no patterns).
     ///
     /// Returns: list of strings
     pub fn split(text: &str, separator: Option<&str>) -> Result<Vec<Value>> {
-        Ok(call("fmt.split", json!([json!(text), match separator { Some(v) => json!(v), None => Value::Null }]))?.as_array().cloned().unwrap_or_default())
+        Ok(call(
+            "fmt.split",
+            json!([
+                json!(text),
+                match separator {
+                    Some(v) => json!(v),
+                    None => Value::Null,
+                }
+            ]),
+        )?
+        .as_array()
+        .cloned()
+        .unwrap_or_default())
     }
 
     /// A text without the spaces at its ends.
@@ -885,7 +1021,6 @@ pub mod fmt {
     pub fn trim(text: &str) -> Result<String> {
         Ok(call("fmt.trim", json!([json!(text)]))?.as_str().unwrap_or_default().to_string())
     }
-
 }
 
 /// The `game` group of the API.
@@ -935,7 +1070,22 @@ pub mod game {
     ///
     /// Returns: boolean
     pub fn notify(text: &str, kind: Option<&str>, seconds: Option<f64>) -> Result<bool> {
-        Ok(call("game.notify", json!([json!(text), match kind { Some(v) => json!(v), None => Value::Null }, match seconds { Some(v) => json!(v), None => Value::Null }]))?.as_bool().unwrap_or(false))
+        Ok(call(
+            "game.notify",
+            json!([
+                json!(text),
+                match kind {
+                    Some(v) => json!(v),
+                    None => Value::Null,
+                },
+                match seconds {
+                    Some(v) => json!(v),
+                    None => Value::Null,
+                }
+            ]),
+        )?
+        .as_bool()
+        .unwrap_or(false))
     }
 
     /// The system the game runs on: `"windows"`, `"macos"`, `"linux"`, `"android"`.
@@ -978,7 +1128,6 @@ pub mod game {
     pub fn version() -> Result<String> {
         Ok(call("game.version", Value::Array(vec![]))?.as_str().unwrap_or_default().to_string())
     }
-
 }
 
 /// The `input` group of the API.
@@ -989,7 +1138,16 @@ pub mod input {
     ///
     /// Returns: list of tables
     pub fn bindings(vehicles: Option<bool>) -> Result<Vec<Value>> {
-        Ok(call("input.bindings", json!([match vehicles { Some(v) => json!(v), None => Value::Null }]))?.as_array().cloned().unwrap_or_default())
+        Ok(call(
+            "input.bindings",
+            json!([match vehicles {
+                Some(v) => json!(v),
+                None => Value::Null,
+            }]),
+        )?
+        .as_array()
+        .cloned()
+        .unwrap_or_default())
     }
 
     /// The steering wheels, pedals, joysticks and gamepads: `{name, gamepad, axes, buttons}`
@@ -1022,7 +1180,6 @@ pub mod input {
     pub fn mouse() -> Result<Vec<Value>> {
         Ok(call("input.mouse", Value::Array(vec![]))?.as_array().cloned().unwrap_or_default())
     }
-
 }
 
 /// The `json` group of the API.
@@ -1040,9 +1197,20 @@ pub mod json {
     ///
     /// Returns: string
     pub fn encode(value: serde_json::Value, pretty: Option<bool>) -> Result<String> {
-        Ok(call("json.encode", json!([json!(value), match pretty { Some(v) => json!(v), None => Value::Null }]))?.as_str().unwrap_or_default().to_string())
+        Ok(call(
+            "json.encode",
+            json!([
+                json!(value),
+                match pretty {
+                    Some(v) => json!(v),
+                    None => Value::Null,
+                }
+            ]),
+        )?
+        .as_str()
+        .unwrap_or_default()
+        .to_string())
     }
-
 }
 
 /// The `lan` group of the API.
@@ -1077,7 +1245,6 @@ pub mod lan {
     pub fn players() -> Result<Vec<Value>> {
         Ok(call("lan.players", Value::Array(vec![]))?.as_array().cloned().unwrap_or_default())
     }
-
 }
 
 /// The `map` group of the API.
@@ -1127,7 +1294,20 @@ pub mod map {
     ///
     /// Returns: list of tables
     pub fn objects_near(x: f64, y: f64, radius: Option<f64>) -> Result<Vec<Value>> {
-        Ok(call("map.objects_near", json!([json!(x), json!(y), match radius { Some(v) => json!(v), None => Value::Null }]))?.as_array().cloned().unwrap_or_default())
+        Ok(call(
+            "map.objects_near",
+            json!([
+                json!(x),
+                json!(y),
+                match radius {
+                    Some(v) => json!(v),
+                    None => Value::Null,
+                }
+            ]),
+        )?
+        .as_array()
+        .cloned()
+        .unwrap_or_default())
     }
 
     /// Puts the player's bus on the street nearest to a map point (within 300 m), along it.
@@ -1157,7 +1337,23 @@ pub mod map {
     ///
     /// Returns: boolean
     pub fn teleport(x: f64, y: f64, z: Option<f64>, heading: Option<f64>) -> Result<bool> {
-        Ok(call("map.teleport", json!([json!(x), json!(y), match z { Some(v) => json!(v), None => Value::Null }, match heading { Some(v) => json!(v), None => Value::Null }]))?.as_bool().unwrap_or(false))
+        Ok(call(
+            "map.teleport",
+            json!([
+                json!(x),
+                json!(y),
+                match z {
+                    Some(v) => json!(v),
+                    None => Value::Null,
+                },
+                match heading {
+                    Some(v) => json!(v),
+                    None => Value::Null,
+                }
+            ]),
+        )?
+        .as_bool()
+        .unwrap_or(false))
     }
 
     /// The terrain's height alone at a map point.
@@ -1187,7 +1383,6 @@ pub mod map {
     pub fn tiles() -> Result<Vec<Value>> {
         Ok(call("map.tiles", Value::Array(vec![]))?.as_array().cloned().unwrap_or_default())
     }
-
 }
 
 /// The `people` group of the API.
@@ -1214,7 +1409,16 @@ pub mod people {
     ///
     /// Returns: list of tables
     pub fn list(radius: Option<f64>) -> Result<Vec<Value>> {
-        Ok(call("people.list", json!([match radius { Some(v) => json!(v), None => Value::Null }]))?.as_array().cloned().unwrap_or_default())
+        Ok(call(
+            "people.list",
+            json!([match radius {
+                Some(v) => json!(v),
+                None => Value::Null,
+            }]),
+        )?
+        .as_array()
+        .cloned()
+        .unwrap_or_default())
     }
 
     /// Changes the people setting (0 to 3).
@@ -1230,7 +1434,6 @@ pub mod people {
     pub fn stops() -> Result<Vec<Value>> {
         Ok(call("people.stops", Value::Array(vec![]))?.as_array().cloned().unwrap_or_default())
     }
-
 }
 
 /// The `plugin` group of the API.
@@ -1240,14 +1443,31 @@ pub mod plugin {
     ///
     /// Returns: nil
     pub fn broadcast(topic: &str, data: Option<serde_json::Value>) -> Result<()> {
-        call("plugin.broadcast", json!([json!(topic), match data { Some(v) => json!(v), None => Value::Null }]))?; Ok(())
+        call(
+            "plugin.broadcast",
+            json!([
+                json!(topic),
+                match data {
+                    Some(v) => json!(v),
+                    None => Value::Null,
+                }
+            ]),
+        )?;
+        Ok(())
     }
 
     /// Switches the plugin off until its file changes or the game starts again (its `stop` comes).
     ///
     /// Returns: nil
     pub fn disable(reason: Option<&str>) -> Result<()> {
-        call("plugin.disable", json!([match reason { Some(v) => json!(v), None => Value::Null }]))?; Ok(())
+        call(
+            "plugin.disable",
+            json!([match reason {
+                Some(v) => json!(v),
+                None => Value::Null,
+            }]),
+        )?;
+        Ok(())
     }
 
     /// How many errors the plugin had (at 10 it is switched off).
@@ -1261,7 +1481,16 @@ pub mod plugin {
     ///
     /// Returns: list of tables
     pub fn files(dir: Option<&str>) -> Result<Vec<Value>> {
-        Ok(call("plugin.files", json!([match dir { Some(v) => json!(v), None => Value::Null }]))?.as_array().cloned().unwrap_or_default())
+        Ok(call(
+            "plugin.files",
+            json!([match dir {
+                Some(v) => json!(v),
+                None => Value::Null,
+            }]),
+        )?
+        .as_array()
+        .cloned()
+        .unwrap_or_default())
     }
 
     /// The names of the plugins loaded, this one too.
@@ -1298,7 +1527,18 @@ pub mod plugin {
     ///
     /// Returns: nil
     pub fn send(to: &str, topic: &str, data: Option<serde_json::Value>) -> Result<()> {
-        call("plugin.send", json!([json!(to), json!(topic), match data { Some(v) => json!(v), None => Value::Null }]))?; Ok(())
+        call(
+            "plugin.send",
+            json!([
+                json!(to),
+                json!(topic),
+                match data {
+                    Some(v) => json!(v),
+                    None => Value::Null,
+                }
+            ]),
+        )?;
+        Ok(())
     }
 
     /// Changes a setting (held to its range; saved); `true` when it took the value.
@@ -1323,7 +1563,16 @@ pub mod plugin {
     ///
     /// Returns: table
     pub fn settings(settings: serde_json::Value, title: Option<&str>) -> Result<Value> {
-        call("plugin.settings", json!([json!(settings), match title { Some(v) => json!(v), None => Value::Null }]))
+        call(
+            "plugin.settings",
+            json!([
+                json!(settings),
+                match title {
+                    Some(v) => json!(v),
+                    None => Value::Null,
+                }
+            ]),
+        )
     }
 
     /// Shows the plugin's settings panel (or hides it with `false`); it can be dragged and closed
@@ -1331,9 +1580,16 @@ pub mod plugin {
     ///
     /// Returns: boolean
     pub fn show_settings(on: Option<bool>) -> Result<bool> {
-        Ok(call("plugin.show_settings", json!([match on { Some(v) => json!(v), None => Value::Null }]))?.as_bool().unwrap_or(false))
+        Ok(call(
+            "plugin.show_settings",
+            json!([match on {
+                Some(v) => json!(v),
+                None => Value::Null,
+            }]),
+        )?
+        .as_bool()
+        .unwrap_or(false))
     }
-
 }
 
 /// The `storage` group of the API.
@@ -1350,7 +1606,8 @@ pub mod storage {
     ///
     /// Returns: nil
     pub fn clear() -> Result<()> {
-        call("storage.clear", Value::Array(vec![]))?; Ok(())
+        call("storage.clear", Value::Array(vec![]))?;
+        Ok(())
     }
 
     /// Removes a key; `true` when it was there.
@@ -1379,7 +1636,8 @@ pub mod storage {
     ///
     /// Returns: nil
     pub fn save() -> Result<()> {
-        call("storage.save", Value::Array(vec![]))?; Ok(())
+        call("storage.save", Value::Array(vec![]))?;
+        Ok(())
     }
 
     /// Stores a value under a key: a number, text, boolean or a table of them (`nil` removes it).
@@ -1387,9 +1645,9 @@ pub mod storage {
     ///
     /// Returns: nil
     pub fn set(key: &str, value: serde_json::Value) -> Result<()> {
-        call("storage.set", json!([json!(key), json!(value)]))?; Ok(())
+        call("storage.set", json!([json!(key), json!(value)]))?;
+        Ok(())
     }
-
 }
 
 /// The `timetable` group of the API.
@@ -1417,7 +1675,6 @@ pub mod timetable {
     pub fn stop_names() -> Result<Vec<Value>> {
         Ok(call("timetable.stop_names", Value::Array(vec![]))?.as_array().cloned().unwrap_or_default())
     }
-
 }
 
 /// The `traffic` group of the API.
@@ -1428,7 +1685,13 @@ pub mod traffic {
     ///
     /// Returns: table or nil
     pub fn ahead(reach: Option<f64>) -> Result<Value> {
-        call("traffic.ahead", json!([match reach { Some(v) => json!(v), None => Value::Null }]))
+        call(
+            "traffic.ahead",
+            json!([match reach {
+                Some(v) => json!(v),
+                None => Value::Null,
+            }]),
+        )
     }
 
     /// Takes every car not running to a timetable off the road; how many went.
@@ -1459,7 +1722,13 @@ pub mod traffic {
     ///
     /// Returns: table or nil
     pub fn light_ahead(reach: Option<f64>) -> Result<Value> {
-        call("traffic.light_ahead", json!([match reach { Some(v) => json!(v), None => Value::Null }]))
+        call(
+            "traffic.light_ahead",
+            json!([match reach {
+                Some(v) => json!(v),
+                None => Value::Null,
+            }]),
+        )
     }
 
     /// The AI vehicles (within `radius` m of the player's bus, when given): `{id, kind, name, x, y,
@@ -1470,7 +1739,16 @@ pub mod traffic {
     ///
     /// Returns: list of tables
     pub fn list(radius: Option<f64>) -> Result<Vec<Value>> {
-        Ok(call("traffic.list", json!([match radius { Some(v) => json!(v), None => Value::Null }]))?.as_array().cloned().unwrap_or_default())
+        Ok(call(
+            "traffic.list",
+            json!([match radius {
+                Some(v) => json!(v),
+                None => Value::Null,
+            }]),
+        )?
+        .as_array()
+        .cloned()
+        .unwrap_or_default())
     }
 
     /// The AI vehicle nearest to the player's bus (of that `kind`, when given), with its
@@ -1478,9 +1756,14 @@ pub mod traffic {
     ///
     /// Returns: table or nil
     pub fn nearest(kind: Option<&str>) -> Result<Value> {
-        call("traffic.nearest", json!([match kind { Some(v) => json!(v), None => Value::Null }]))
+        call(
+            "traffic.nearest",
+            json!([match kind {
+                Some(v) => json!(v),
+                None => Value::Null,
+            }]),
+        )
     }
-
 }
 
 /// The `ui` group of the API.
@@ -1490,7 +1773,8 @@ pub mod ui {
     ///
     /// Returns: nil
     pub fn clear() -> Result<()> {
-        call("ui.clear", Value::Array(vec![]))?; Ok(())
+        call("ui.clear", Value::Array(vec![]))?;
+        Ok(())
     }
 
     /// `true`: the panels get the mouse (the cursor shows, a click goes to the panel under it and
@@ -1548,7 +1832,18 @@ pub mod ui {
     ///
     /// Returns: boolean
     pub fn show(panel: &str, on: Option<bool>) -> Result<bool> {
-        Ok(call("ui.show", json!([json!(panel), match on { Some(v) => json!(v), None => Value::Null }]))?.as_bool().unwrap_or(false))
+        Ok(call(
+            "ui.show",
+            json!([
+                json!(panel),
+                match on {
+                    Some(v) => json!(v),
+                    None => Value::Null,
+                }
+            ]),
+        )?
+        .as_bool()
+        .unwrap_or(false))
     }
 
     /// A notification card at the top right, newest at the top; it goes after `opts.seconds` (1 to
@@ -1557,7 +1852,19 @@ pub mod ui {
     ///
     /// Returns: true, or false and the reason
     pub fn toast(text: &str, opts: Option<serde_json::Value>) -> Result<Vec<Value>> {
-        Ok(call("ui.toast", json!([json!(text), match opts { Some(v) => json!(v), None => Value::Null }]))?.as_array().cloned().unwrap_or_default())
+        Ok(call(
+            "ui.toast",
+            json!([
+                json!(text),
+                match opts {
+                    Some(v) => json!(v),
+                    None => Value::Null,
+                }
+            ]),
+        )?
+        .as_array()
+        .cloned()
+        .unwrap_or_default())
     }
 
     /// Shows a hidden panel or hides a shown one; whether it shows now.
@@ -1581,7 +1888,10 @@ pub mod ui {
     ///
     /// Returns: true, or false and the reason
     pub fn update(panel: &str, element: &str, values: serde_json::Value) -> Result<Vec<Value>> {
-        Ok(call("ui.update", json!([json!(panel), json!(element), json!(values)]))?.as_array().cloned().unwrap_or_default())
+        Ok(call("ui.update", json!([json!(panel), json!(element), json!(values)]))?
+            .as_array()
+            .cloned()
+            .unwrap_or_default())
     }
 
     /// The value of a checkbox, slider, text field or tabs element now (as `ui_change` gives it).
@@ -1590,7 +1900,6 @@ pub mod ui {
     pub fn value(panel: &str, element: &str) -> Result<Value> {
         call("ui.value", json!([json!(panel), json!(element)]))
     }
-
 }
 
 /// The `util` group of the API.
@@ -1601,7 +1910,13 @@ pub mod util {
     ///
     /// Returns: table
     pub fn date(seconds: Option<f64>) -> Result<Value> {
-        call("util.date", json!([match seconds { Some(v) => json!(v), None => Value::Null }]))
+        call(
+            "util.date",
+            json!([match seconds {
+                Some(v) => json!(v),
+                None => Value::Null,
+            }]),
+        )
     }
 
     /// Milliseconds of real time since the game started: for timing a plugin's own work.
@@ -1623,9 +1938,22 @@ pub mod util {
     ///
     /// Returns: number
     pub fn random(min: Option<f64>, max: Option<f64>) -> Result<f64> {
-        Ok(call("util.random", json!([match min { Some(v) => json!(v), None => Value::Null }, match max { Some(v) => json!(v), None => Value::Null }]))?.as_f64().unwrap_or(0.0))
+        Ok(call(
+            "util.random",
+            json!([
+                match min {
+                    Some(v) => json!(v),
+                    None => Value::Null,
+                },
+                match max {
+                    Some(v) => json!(v),
+                    None => Value::Null,
+                }
+            ]),
+        )?
+        .as_f64()
+        .unwrap_or(0.0))
     }
-
 }
 
 /// The `vec` group of the API.
@@ -1663,7 +1991,9 @@ pub mod vec {
     ///
     /// Returns: number
     pub fn distance3(x1: f64, y1: f64, z1: f64, x2: f64, y2: f64, z2: f64) -> Result<f64> {
-        Ok(call("vec.distance3", json!([json!(x1), json!(y1), json!(z1), json!(x2), json!(y2), json!(z2)]))?.as_f64().unwrap_or(0.0))
+        Ok(call("vec.distance3", json!([json!(x1), json!(y1), json!(z1), json!(x2), json!(y2), json!(z2)]))?
+            .as_f64()
+            .unwrap_or(0.0))
     }
 
     /// The dot product of two 2D vectors.
@@ -1685,7 +2015,19 @@ pub mod vec {
     ///
     /// Returns: number
     pub fn length(x: f64, y: f64, z: Option<f64>) -> Result<f64> {
-        Ok(call("vec.length", json!([json!(x), json!(y), match z { Some(v) => json!(v), None => Value::Null }]))?.as_f64().unwrap_or(0.0))
+        Ok(call(
+            "vec.length",
+            json!([
+                json!(x),
+                json!(y),
+                match z {
+                    Some(v) => json!(v),
+                    None => Value::Null,
+                }
+            ]),
+        )?
+        .as_f64()
+        .unwrap_or(0.0))
     }
 
     /// From `a` to `b` by `t` (0 to 1, not held to it).
@@ -1699,7 +2041,20 @@ pub mod vec {
     ///
     /// Returns: x, y, z
     pub fn normalize(x: f64, y: f64, z: Option<f64>) -> Result<Vec<Value>> {
-        Ok(call("vec.normalize", json!([json!(x), json!(y), match z { Some(v) => json!(v), None => Value::Null }]))?.as_array().cloned().unwrap_or_default())
+        Ok(call(
+            "vec.normalize",
+            json!([
+                json!(x),
+                json!(y),
+                match z {
+                    Some(v) => json!(v),
+                    None => Value::Null,
+                }
+            ]),
+        )?
+        .as_array()
+        .cloned()
+        .unwrap_or_default())
     }
 
     /// A vector turned clockwise by `degrees` (as headings turn).
@@ -1713,9 +2068,11 @@ pub mod vec {
     ///
     /// Returns: right, ahead
     pub fn to_local(x: f64, y: f64, ox: f64, oy: f64, heading: f64) -> Result<Vec<Value>> {
-        Ok(call("vec.to_local", json!([json!(x), json!(y), json!(ox), json!(oy), json!(heading)]))?.as_array().cloned().unwrap_or_default())
+        Ok(call("vec.to_local", json!([json!(x), json!(y), json!(ox), json!(oy), json!(heading)]))?
+            .as_array()
+            .cloned()
+            .unwrap_or_default())
     }
-
 }
 
 /// The `weather` group of the API.
@@ -1744,7 +2101,19 @@ pub mod weather {
     ///
     /// Returns: true, or false and the reason
     pub fn preset(file: &str, seconds: Option<f64>) -> Result<Vec<Value>> {
-        Ok(call("weather.preset", json!([json!(file), match seconds { Some(v) => json!(v), None => Value::Null }]))?.as_array().cloned().unwrap_or_default())
+        Ok(call(
+            "weather.preset",
+            json!([
+                json!(file),
+                match seconds {
+                    Some(v) => json!(v),
+                    None => Value::Null,
+                }
+            ]),
+        )?
+        .as_array()
+        .cloned()
+        .unwrap_or_default())
     }
 
     /// The weather files installed: `{file, name}`.
@@ -1793,7 +2162,6 @@ pub mod weather {
     pub fn wind() -> Result<Vec<Value>> {
         Ok(call("weather.wind", Value::Array(vec![]))?.as_array().cloned().unwrap_or_default())
     }
-
 }
 
 /// The `world` group of the API.
@@ -1872,6 +2240,4 @@ pub mod world {
     pub fn time_speed() -> Result<Option<f64>> {
         Ok(call("world.time_speed", Value::Array(vec![]))?.as_f64())
     }
-
 }
-

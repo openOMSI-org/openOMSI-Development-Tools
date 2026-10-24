@@ -1,0 +1,32 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "openOMSI Dev Tools",
+  "version": "0.2.0",
+  "identifier": "org.openomsi.devtools",
+  "build": {
+    "frontendDist": "ui"
+  },
+  "app": {
+    "withGlobalTauri": true,
+    "windows": [],
+    "security": {
+      "csp": {
+        "default-src": "'self'",
+        "script-src": "'self'",
+        "style-src": "'self' 'unsafe-inline'",
+        "font-src": "'self' data:",
+        "img-src": "'self' data: blob:",
+        "connect-src": "'self' ipc: http://ipc.localhost",
+        "worker-src": "'self' blob:"
+      }
+    }
+  },
+  "bundle": {
+    "active": false,
+    "icon": [
+      "../../assets/icons/devtools-512.png",
+      "../../assets/icons/devtools.icns",
+      "../../assets/icons/devtools.ico"
+    ]
+  }
+}

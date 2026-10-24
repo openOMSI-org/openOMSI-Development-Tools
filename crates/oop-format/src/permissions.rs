@@ -19,7 +19,10 @@ pub struct Permission {
 /// `docs/plugin-api.json`).
 pub const KNOWN: &[Permission] = &[
     Permission { name: "ui", description: "Show panels, notifications and messages on the screen" },
-    Permission { name: "storage", description: "Keep data between sessions in the plugin's own data folder and storage" },
+    Permission {
+        name: "storage",
+        description: "Keep data between sessions in the plugin's own data folder and storage",
+    },
     Permission {
         name: "vehicle_write",
         description: "Change the player's bus: script variables, keys and triggers, doors, the destination",

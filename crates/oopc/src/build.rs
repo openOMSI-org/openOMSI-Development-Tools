@@ -17,11 +17,25 @@ pub struct Built {
     pub notes: Vec<String>,
 }
 
+/// How a build runs: which `cargo` to start, and where its progress goes.
+#[derive(Default)]
+pub struct BuildOptions<'a> {
+    /// The `cargo` to run (`cargo` from the PATH when none).
+    pub cargo: Option<&'a Path>,
+    /// Gets every line `cargo` prints while it works (the desktop app shows them live).
+    pub log: Option<&'a (dyn Fn(&str) + Sync)>,
+}
+
 /// Compiles a project (dispatching on its kind).
 pub fn compile(dir: &Path, manifest: &Manifest) -> Result<Built, String> {
+    compile_with(dir, manifest, &BuildOptions::default())
+}
+
+/// Compiles a project with the given options.
+pub fn compile_with(dir: &Path, manifest: &Manifest, opts: &BuildOptions) -> Result<Built, String> {
     match manifest.plugin.kind {
         ProjectKind::Lua => compile_lua(dir, manifest),
-        ProjectKind::Rust => compile_rust(dir, manifest),
+        ProjectKind::Rust => compile_rust(dir, manifest, opts),
     }
 }
 
@@ -116,7 +130,7 @@ fn compile_lua(dir: &Path, manifest: &Manifest) -> Result<Built, String> {
     Ok(Built { files, notes })
 }
 
-fn compile_rust(dir: &Path, manifest: &Manifest) -> Result<Built, String> {
+fn compile_rust(dir: &Path, manifest: &Manifest, opts: &BuildOptions) -> Result<Built, String> {
     let cargo_toml = dir.join("Cargo.toml");
     if !cargo_toml.is_file() {
         return Err(format!("no Cargo.toml in {} (a Rust plugin is a cdylib crate)", dir.display()));
@@ -124,27 +138,69 @@ fn compile_rust(dir: &Path, manifest: &Manifest) -> Result<Built, String> {
     let mut notes = Vec::new();
 
     // Build the cdylib for wasm, asking cargo for machine-readable artifact paths.
-    let mut cmd = Command::new("cargo");
+    let mut cmd = Command::new(opts.cargo.map(Path::as_os_str).unwrap_or(std::ffi::OsStr::new("cargo")));
     cmd.arg("build")
         .arg("--release")
         .arg("--target")
         .arg("wasm32-unknown-unknown")
         .arg("--manifest-path")
         .arg(&cargo_toml)
-        .arg("--message-format=json-render-diagnostics");
+        .arg("--message-format=json-render-diagnostics")
+        .stdout(std::process::Stdio::piped())
+        .stderr(std::process::Stdio::piped());
+    // (a program started from a window has no shell's PATH: rustc is found beside cargo)
+    if let Some(bin) = opts.cargo.and_then(Path::parent).filter(|p| !p.as_os_str().is_empty()) {
+        let mut paths = vec![bin.to_path_buf()];
+        paths.extend(std::env::split_paths(&std::env::var_os("PATH").unwrap_or_default()));
+        if let Ok(joined) = std::env::join_paths(paths) {
+            cmd.env("PATH", joined);
+        }
+    }
     if !manifest.rust.features.is_empty() {
         cmd.arg("--features").arg(manifest.rust.features.join(","));
     }
-    let output = cmd.output().map_err(|e| {
-        format!("running cargo: {e}\nhint: install Rust and `rustup target add wasm32-unknown-unknown`")
+    let mut child = cmd.spawn().map_err(|e| {
+        format!("running cargo: {e}\nhint: install Rust (rustup.rs) and `rustup target add wasm32-unknown-unknown`, or set the path to cargo in Settings")
     })?;
-    if !output.status.success() {
-        return Err(format!("cargo build failed:\n{}", String::from_utf8_lossy(&output.stderr).trim()));
+    let stdout = child.stdout.take().ok_or("cargo gave no output")?;
+    let stderr = child.stderr.take().ok_or("cargo gave no error output")?;
+    let log = opts.log;
+    let (out_text, err_text) = std::thread::scope(|scope| {
+        // (the artifact lines on stdout; cargo's own messages on stderr, passed on as they come)
+        let reader = scope.spawn(move || {
+            use std::io::Read;
+            let mut text = String::new();
+            let _ = std::io::BufReader::new(stdout).read_to_string(&mut text);
+            text
+        });
+        let mut err_text = String::new();
+        {
+            use std::io::BufRead;
+            for line in std::io::BufReader::new(stderr).lines().map_while(Result::ok) {
+                if let Some(f) = log {
+                    f(&line);
+                }
+                err_text.push_str(&line);
+                err_text.push('\n');
+            }
+        }
+        (reader.join().unwrap_or_default(), err_text)
+    });
+    let status = child.wait().map_err(|e| format!("waiting for cargo: {e}"))?;
+    if !status.success() {
+        let text = err_text.trim();
+        let hint = if text.contains("wasm32-unknown-unknown") && text.contains("target") {
+            "\nhint: run `rustup target add wasm32-unknown-unknown` (Settings has a button for it)"
+        } else {
+            ""
+        };
+        return Err(format!("cargo build failed:\n{text}{hint}"));
     }
+    let output_stdout = out_text;
 
     // Find the cdylib .wasm among the JSON artifact lines.
     let mut wasm_path: Option<PathBuf> = None;
-    for line in String::from_utf8_lossy(&output.stdout).lines() {
+    for line in output_stdout.lines() {
         let Ok(msg) = serde_json::from_str::<serde_json::Value>(line) else { continue };
         if msg.get("reason").and_then(|r| r.as_str()) != Some("compiler-artifact") {
             continue;

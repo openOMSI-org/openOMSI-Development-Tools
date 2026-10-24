@@ -1,2 +1,6 @@
 [alias]
 xtask = "run --package xtask --"
+
+# (the C runtime is linked in on Windows: nothing to install next to the program)
+[target.'cfg(all(windows, target_env = "msvc"))']
+rustflags = ["-C", "target-feature=+crt-static"]

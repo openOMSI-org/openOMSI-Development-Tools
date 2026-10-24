@@ -143,7 +143,7 @@ fn wrap(title: &str, current: &str, body: &str) -> String {
     format!(
         "<!doctype html>\n<html lang=\"en\"><head><meta charset=\"utf-8\">\n\
 <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n\
-<title>{title} — openOMSI Development Tools</title>\n<style>{CSS}</style></head>\n\
+<title>{title} | openOMSI Development Tools</title>\n<style>{CSS}</style></head>\n\
 <body><header><a class=\"brand\" href=\"index.html\"><b>openOMSI</b> Development Tools</a>\n\
 <nav>{nav}</nav></header>\n<main>{body}</main>\n\
 <footer>openOMSI Development Tools · <a href=\"https://github.com/openOMSI-org/openOMSI-Development-Tools\">GitHub</a></footer></body></html>\n",
@@ -184,7 +184,7 @@ th,td { border:1px solid #2a2e37; padding:8px 10px; text-align:left; }
 const LANDING: &str = r#"
 <div class="hero">
   <h1>openOMSI Development Tools</h1>
-  <p>Build, sign and ship plugins for openOMSI — a plugin compiler, a Rust SDK, and a desktop app.</p>
+  <p>Build, sign and ship plugins for openOMSI: a plugin compiler, a Rust SDK, and a desktop app with a built-in code editor.</p>
   <p><a href="getting-started.html">Get started →</a> ·
      <a href="https://github.com/openOMSI-org/openOMSI-Development-Tools/releases">Downloads</a> ·
      <a href="https://github.com/openOMSI-org/openOMSI">openOMSI</a></p>
@@ -192,7 +192,7 @@ const LANDING: &str = r#"
 <div class="cards">
   <div class="card"><h3>oopc</h3><p>A CLI that compiles Lua or Rust plugins into a single signed <code>.oop</code> file.</p><p><a href="cli.html">CLI reference →</a></p></div>
   <div class="card"><h3>Rust SDK</h3><p>Write plugins in Rust with a safe, typed API that compiles to WebAssembly.</p><p><a href="sdk.html">SDK guide →</a></p></div>
-  <div class="card"><h3>Desktop app</h3><p>Open projects, edit the manifest, build with a live log, manage keys and inspect files.</p></div>
-  <div class="card"><h3>The .oop format</h3><p>A compiled, sandboxed plugin — never your source. Signed with Ed25519.</p><p><a href="oop-format.html">How it works →</a></p></div>
+  <div class="card"><h3>Desktop app</h3><p>A code editor that knows the plugin API, one button to run the plugin in openOMSI, builds, signing keys and an inspector.</p><p><a href="getting-started.html">Get the app →</a></p></div>
+  <div class="card"><h3>The .oop format</h3><p>A compiled, sandboxed plugin that never holds your source. Signed with Ed25519.</p><p><a href="oop-format.html">How it works →</a></p></div>
 </div>
 "#;

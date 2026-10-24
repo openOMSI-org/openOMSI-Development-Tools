@@ -4,7 +4,7 @@ use std::path::Path;
 
 use oop_format::{
     Oop, OopBuilder, decode_public_key, decode_secret_key, encode_public_key, encode_secret_key, fingerprint,
-    generate_key, inspect_details, permissions,
+    generate_key, inspect_details,
 };
 
 use crate::build;
@@ -226,83 +226,23 @@ pub fn inspect(file: &Path, json: bool) -> Result<(), String> {
 pub fn check(dir: Option<&Path>) -> Result<(), String> {
     let dir = dir.unwrap_or_else(|| Path::new("."));
     let manifest = Manifest::load(dir)?;
-    let header = manifest.to_header();
-    let mut warnings = Vec::new();
-
-    header.validate().map_err(|e| e.to_string())?;
-
-    // The entry file must exist for a Lua plugin (a Rust one builds it).
-    if manifest.plugin.kind == crate::manifest::ProjectKind::Lua {
-        let entry = dir.join(manifest.entry());
-        if !entry.is_file() {
-            return Err(format!("the entry file {} does not exist", manifest.entry()));
+    let problems = crate::lint::check_project(dir);
+    let errors = problems.iter().filter(|p| p.severity == crate::lint::Severity::Error).count();
+    for p in &problems {
+        let kind = if p.severity == crate::lint::Severity::Error { "error" } else { "warning" };
+        if p.file.is_empty() {
+            println!("{kind}: {}", p.message);
+        } else {
+            println!("{kind}: {}:{}:{}: {}", p.file, p.line, p.col, p.message);
         }
     }
-
-    // Declared permissions should be ones the tools know.
-    for p in &header.permissions {
-        if permissions::find(p).is_none() {
-            warnings.push(format!("permission {p:?} is not one this openOMSI knows"));
-        }
-    }
-
-    // For Lua, compare the permissions the code actually uses against those declared.
-    if manifest.plugin.kind == crate::manifest::ProjectKind::Lua {
-        let mut source = String::new();
-        collect_lua(dir, &mut source)?;
-        let map = util::permission_map();
-        let declared: std::collections::BTreeSet<&str> = header.permissions.iter().map(String::as_str).collect();
-        let mut needed: std::collections::BTreeMap<String, String> = std::collections::BTreeMap::new();
-        for (func, perm) in &map {
-            if source.contains(&format!("omsi.{func}")) {
-                needed.insert(perm.clone(), func.clone());
-            }
-        }
-        if source.contains("omsi.data") {
-            needed.insert("storage".to_string(), "omsi.data".to_string());
-        }
-        for (perm, func) in &needed {
-            if !declared.contains(perm.as_str()) {
-                warnings.push(format!(
-                    "uses `{func}`, which needs the `{perm}` permission - add it to [plugin].permissions"
-                ));
-            }
-        }
-        for p in &header.permissions {
-            if permissions::find(p).is_some() && !needed.contains_key(p) {
-                warnings.push(format!("permission `{p}` is declared but the code does not seem to use it"));
-            }
-        }
-    }
-
-    if warnings.is_empty() {
+    if problems.is_empty() {
         println!("{}: no problems found", manifest.plugin.id);
     } else {
-        for w in &warnings {
-            println!("warning: {w}");
-        }
-        println!("{} warning(s)", warnings.len());
+        println!("{} problem(s)", problems.len());
     }
-    Ok(())
-}
-
-fn collect_lua(dir: &Path, out: &mut String) -> Result<(), String> {
-    let mut stack = vec![dir.to_path_buf()];
-    while let Some(d) = stack.pop() {
-        for entry in std::fs::read_dir(&d).map_err(|e| e.to_string())? {
-            let entry = entry.map_err(|e| e.to_string())?;
-            let path = entry.path();
-            let name = entry.file_name().to_string_lossy().into_owned();
-            if name.starts_with('.') || matches!(name.as_str(), "dist" | "target") {
-                continue;
-            }
-            if path.is_dir() {
-                stack.push(path);
-            } else if path.extension().is_some_and(|e| e == "lua") {
-                out.push_str(&std::fs::read_to_string(&path).map_err(|e| e.to_string())?);
-                out.push('\n');
-            }
-        }
+    if errors > 0 {
+        return Err(format!("{errors} error(s) in the project"));
     }
     Ok(())
 }

@@ -19,7 +19,7 @@ default-members = [
 ]
 
 [workspace.package]
-version = "0.1.0"
+version = "0.2.0"
 edition = "2024"
 rust-version = "1.90"
 license = "MIT"
@@ -28,9 +28,9 @@ homepage = "https://openomsi-org.github.io/openOMSI-Development-Tools/"
 authors = ["usonskyyyy"]
 
 [workspace.dependencies]
-oop-format = { path = "crates/oop-format", version = "0.1.0" }
-lua-obfuscator = { path = "crates/lua-obfuscator", version = "0.1.0" }
-wasm-strip = { path = "crates/wasm-strip", version = "0.1.0" }
+oop-format = { path = "crates/oop-format", version = "0.2.0" }
+lua-obfuscator = { path = "crates/lua-obfuscator", version = "0.2.0" }
+wasm-strip = { path = "crates/wasm-strip", version = "0.2.0" }
 serde = { version = "1", features = ["derive"] }
 serde_json = { version = "1", features = ["preserve_order"] }
 
@@ -39,19 +39,26 @@ lto = "thin"
 codegen-units = 4
 strip = "debuginfo"
 
+# (the desktop app is mostly a web page: a small program loads faster)
+[profile.release.package.openomsi-devtools]
+opt-level = "s"
+
 [profile.dev.package."*"]
 opt-level = 1
 
-# wgpu from the org's fork (upstream v29.0.4 plus fixes), the same revision openOMSI uses, so the
-# devtools render with exactly the backend the game ships. Every fork crate Cargo.lock pulls in is
-# patched (an unused patch is dropped with a warning).
+# Tauri from the organisation's fork (openOMSI-org/tauri-openomsi, branch openomsi/v2 =
+# tauri-v2.12.3 plus fixes), the one openOMSI's launcher is built on: an application webview
+# instead of a browser tab (`app_mode`), the window shown with its first page instead of white
+# (`show_when_loaded`), WebKitGTK's blank window on NVIDIA. Every crate of the fork that
+# Cargo.lock lists is patched.
 [patch.crates-io]
-wgpu = { git = "https://github.com/openOMSI-Project/wgpu-openomsi", rev = "4eb06e5bf8062be2978d93e95556a4dd83f1d3b8" }
-wgpu-core = { git = "https://github.com/openOMSI-Project/wgpu-openomsi", rev = "4eb06e5bf8062be2978d93e95556a4dd83f1d3b8" }
-wgpu-core-deps-apple = { git = "https://github.com/openOMSI-Project/wgpu-openomsi", rev = "4eb06e5bf8062be2978d93e95556a4dd83f1d3b8" }
-wgpu-core-deps-emscripten = { git = "https://github.com/openOMSI-Project/wgpu-openomsi", rev = "4eb06e5bf8062be2978d93e95556a4dd83f1d3b8" }
-wgpu-core-deps-windows-linux-android = { git = "https://github.com/openOMSI-Project/wgpu-openomsi", rev = "4eb06e5bf8062be2978d93e95556a4dd83f1d3b8" }
-wgpu-hal = { git = "https://github.com/openOMSI-Project/wgpu-openomsi", rev = "4eb06e5bf8062be2978d93e95556a4dd83f1d3b8" }
-wgpu-types = { git = "https://github.com/openOMSI-Project/wgpu-openomsi", rev = "4eb06e5bf8062be2978d93e95556a4dd83f1d3b8" }
-wgpu-naga-bridge = { git = "https://github.com/openOMSI-Project/wgpu-openomsi", rev = "4eb06e5bf8062be2978d93e95556a4dd83f1d3b8" }
-naga = { git = "https://github.com/openOMSI-Project/wgpu-openomsi", rev = "4eb06e5bf8062be2978d93e95556a4dd83f1d3b8" }
+# glib 0.18.5 of the GTK3 stack Tauri needs on Linux, with the fix of RUSTSEC-2024-0429
+# brought from glib 0.20; see patches/README.md
+glib = { path = "patches/glib" }
+tauri = { git = "https://github.com/openOMSI-org/tauri-openomsi", rev = "880c1b18348a" }
+tauri-build = { git = "https://github.com/openOMSI-org/tauri-openomsi", rev = "880c1b18348a" }
+tauri-codegen = { git = "https://github.com/openOMSI-org/tauri-openomsi", rev = "880c1b18348a" }
+tauri-macros = { git = "https://github.com/openOMSI-org/tauri-openomsi", rev = "880c1b18348a" }
+tauri-runtime = { git = "https://github.com/openOMSI-org/tauri-openomsi", rev = "880c1b18348a" }
+tauri-runtime-wry = { git = "https://github.com/openOMSI-org/tauri-openomsi", rev = "880c1b18348a" }
+tauri-utils = { git = "https://github.com/openOMSI-org/tauri-openomsi", rev = "880c1b18348a" }

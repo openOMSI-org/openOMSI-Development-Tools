@@ -3,6 +3,7 @@
 
 pub mod build;
 pub mod commands;
+pub mod lint;
 pub mod manifest;
 pub mod templates;
 pub mod util;
